@@ -14,7 +14,11 @@ import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.eclipse.microprofile.openapi.annotations.security.SecuritySchemes;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
+import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
 
+import io.quarkus.security.Authenticated;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -30,6 +34,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Path("/api/users")
+@SecuritySchemes(value = {
+        @SecurityScheme(securitySchemeName = "apiKey",
+                type = SecuritySchemeType.HTTP,
+                scheme = "Bearer")}
+)
 public class UsersResource {
 
     @GET
@@ -43,6 +52,7 @@ public class UsersResource {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = UserDto.class))
     )})
+    @Authenticated
     public Response users() {
         UserDto user1 = UserDto.builder()
                 .id("some-id-1")
@@ -106,17 +116,7 @@ public class UsersResource {
     @PUT
     @Consumes({"application/json"})
     @Produces({"application/json"})
-    @Operation(summary = "Update user",
-            description = "Updates the user")
-    @Tag(name = "Users")
-    @APIResponses({@APIResponse(
-            responseCode = "200",
-            description = "Updated user",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = UserDto.class))
-    )})
-    public Response update(@RequestBody(description = "Updated user object", required = true,
-            content = @Content(schema = @Schema(implementation = UserDto.class))) UserDto userDto) {
+    public Response update(UserDto userDto) {
         log.info("User {} was updated.", userDto);
         return Response.ok(userDto).build();
     }

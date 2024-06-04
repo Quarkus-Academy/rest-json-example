@@ -1,55 +1,65 @@
+---
 openapi: 3.0.3
 info:
-  title: Quarkus Academy OpenAPI
-  version: 1.0.0-SNAPSHOT
+  title: Users API
+  description: Simple users API
+  termsOfService: No terms
+  contact:
+    name: Adam Seidel
+    url: http://exampleurl.com/contact
+    email: aseidel@sk.ibm.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
 tags:
   - name: Users
-    description: Users API
 paths:
   /api/users:
     get:
       tags:
         - Users
-      operationId: users
+      summary: All users
+      description: Returns all of the users
       responses:
         "200":
           description: List of all users
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/UserDto"
+                $ref: "#/components/schemas/UserDto"
+        "403":
+          description: Not Allowed
+        "401":
+          description: Not Authorized
+      security:
+        - apiKey: []
     put:
       tags:
-        - Users
-      operationId: update
+        - Users Resource
       requestBody:
         content:
           application/json:
             schema:
-              type: object
               $ref: "#/components/schemas/UserDto"
       responses:
         "200":
-          description: User object
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserDto"
+          description: OK
     post:
       tags:
         - Users
-      operationId: save
+      summary: Save user
+      description: Saves the user
       requestBody:
+        description: Created user object
         content:
           application/json:
             schema:
-              type: object
               $ref: "#/components/schemas/UserDto"
+        required: true
       responses:
         "200":
-          description: User was sucessfuly saved
+          description: Saved user
           content:
             application/json:
               schema:
@@ -58,20 +68,25 @@ paths:
     get:
       tags:
         - Users
-      operationId: user
+      summary: Get user
+      description: Returns user with the provided id
       parameters:
         - name: id
           in: path
+          description: Id of the user
           required: true
           schema:
             type: string
+          example: 1
         - name: omit-birthdate
           in: query
+          description: Flag to disable/enable birthday
           schema:
             type: boolean
+          example: true
       responses:
         "200":
-          description: User object
+          description: User with the provided id
           content:
             application/json:
               schema:
@@ -79,37 +94,48 @@ paths:
     delete:
       tags:
         - Users
-      operationId: delete
+      summary: Delete user
+      description: Deletes user having the provided id
       parameters:
         - name: id
           in: path
+          description: Id of the user to be deleted
           required: true
           schema:
             type: string
+          example: 1
       responses:
-        "200":
-          description: User was deleted
+        "204":
+          description: Confirmation if the user was deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDto"
 components:
   schemas:
-    UserDto:
-      type: object
-      properties:
-        id:
-          type: string
-          description: id of the user
-          example: 1
-        name:
-          type: string
-          description: First name of the user
-          example: Adam
-        surname:
-          type: string
-          description: Last name of the user
-          example: Seidel
-        birthDate:
-          description: Birth date of the user
-          $ref: "#/components/schemas/LocalDate"
     LocalDate:
       format: date
       type: string
       example: 2022-03-10
+    UserDto:
+      description: POJO that represents a user.
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        name:
+          type: string
+          example: Adam
+        surname:
+          type: string
+          example: Seidel
+        birthDate:
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/LocalDate"
+          example: 2000-01-01
+  securitySchemes:
+    apiKey:
+      type: http
+      scheme: Bearer
