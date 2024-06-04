@@ -1,0 +1,220 @@
+{
+  "name": "Quarkus Academy JWT",
+  "version": "1",
+  "items": [
+    {
+      "type": "http",
+      "name": "Autheticate Dummy user",
+      "seq": 1,
+      "request": {
+        "url": "http://localhost:8080/api/login?email=test@test.sk&username=adam&password=heslo",
+        "method": "GET",
+        "headers": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {
+          "res": "bru.setVar(\"jwtTokenDummy\",res.getBody())\n"
+        },
+        "vars": {},
+        "assertions": [],
+        "tests": "test(\"res.status should be 200\", function() {\nexpect(res.getStatus()).to.equal(200);\n});\n",
+        "auth": {
+          "mode": "none"
+        },
+        "query": [
+          {
+            "name": "email",
+            "value": "test@test.sk",
+            "enabled": true
+          },
+          {
+            "name": "username",
+            "value": "adam",
+            "enabled": true
+          },
+          {
+            "name": "password",
+            "value": "heslo",
+            "enabled": true
+          }
+        ]
+      }
+    },
+    {
+      "type": "http",
+      "name": "All users Admin user",
+      "seq": 3,
+      "request": {
+        "url": "http://localhost:8080/api/users",
+        "method": "GET",
+        "headers": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {
+          "req": "req.setHeader(\"Authorization\", \"Bearer \" + bru.getVar(\"jwtToken\"))"
+        },
+        "vars": {},
+        "assertions": [],
+        "tests": "test(\"res.status should be 200\", function() {\nexpect(res.getStatus()).to.equal(200);\n});\n\ntest(\"res.body should contain 2 users\", function() {\nconst data = res.getBody();\nexpect(data.length).to.equal(2);\n});",
+        "auth": {
+          "mode": "none"
+        },
+        "query": []
+      }
+    },
+    {
+      "type": "http",
+      "name": "All users not authenticated",
+      "seq": 4,
+      "request": {
+        "url": "http://localhost:8080/api/users",
+        "method": "GET",
+        "headers": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "test(\"res.status should be 401\", function() {\nexpect(res.getStatus()).to.equal(401);\n});\n",
+        "auth": {
+          "mode": "none"
+        },
+        "query": []
+      }
+    },
+    {
+      "type": "http",
+      "name": "Get user Not Admin",
+      "seq": 5,
+      "request": {
+        "url": "http://localhost:8080/api/users/3",
+        "method": "GET",
+        "headers": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {
+          "req": "req.setHeader(\"Authorization\", \"Bearer \" + bru.getVar(\"jwtTokenDummy\"))"
+        },
+        "vars": {},
+        "assertions": [],
+        "tests": "test(\"res.status should be 403\", function() {\nexpect(res.getStatus()).to.equal(403);\n});\n",
+        "auth": {
+          "mode": "none"
+        },
+        "query": []
+      }
+    },
+    {
+      "type": "http",
+      "name": "Get user Admin",
+      "seq": 6,
+      "request": {
+        "url": "http://localhost:8080/api/users/3",
+        "method": "GET",
+        "headers": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {
+          "req": "req.setHeader(\"Authorization\", \"Bearer \" + bru.getVar(\"jwtToken\"))"
+        },
+        "vars": {},
+        "assertions": [],
+        "tests": "test(\"res.status should be 200\", function() {\nexpect(res.getStatus()).to.equal(200);\n});\n\ntest(\"res.body should contain 1 user with birthdate\", function() {\nconst data = res.getBody();\nexpect(Array.isArray(data)).to.equal(false);\nexpect(Object.keys(data).length).to.equal(4);\nexpect(data.id).to.equal(\"3\");\nexpect(data.name).to.equal(\"Adam\");\nexpect(data.surname).to.equal(\"Seidel\");\nexpect(data.birthDate).to.equal(\"1990-01-01\");\n});",
+        "auth": {
+          "mode": "none"
+        },
+        "query": []
+      }
+    },
+    {
+      "type": "http",
+      "name": "Authenticate Admin user",
+      "seq": 2,
+      "request": {
+        "url": "http://localhost:8080/api/login?email=test1@test.sk&username=adam&password=heslo",
+        "method": "GET",
+        "headers": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {
+          "res": "bru.setVar(\"jwtToken\",res.getBody())\n"
+        },
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "auth": {
+          "mode": "none"
+        },
+        "query": [
+          {
+            "name": "email",
+            "value": "test1@test.sk",
+            "enabled": true
+          },
+          {
+            "name": "username",
+            "value": "adam",
+            "enabled": true
+          },
+          {
+            "name": "password",
+            "value": "heslo",
+            "enabled": true
+          }
+        ]
+      }
+    },
+    {
+      "type": "http",
+      "name": "Save user denied",
+      "seq": 8,
+      "request": {
+        "url": "http://localhost:8080/api/users",
+        "method": "POST",
+        "headers": [],
+        "body": {
+          "mode": "json",
+          "json": "{\n  \"name\": \"Adam\",\n  \"surname\": \"Seidel\",\n  \"birthDate\": \"1990-01-01\"\n}",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "test(\"res.status should be 401\", function() {\nexpect(res.getStatus()).to.equal(401);\n});\n",
+        "auth": {
+          "mode": "none"
+        },
+        "query": []
+      }
+    }
+  ],
+  "environments": [],
+  "brunoConfig": {
+    "version": "1",
+    "name": "Quarkus Academy JWT",
+    "type": "collection",
+    "ignore": [
+      "node_modules",
+      ".git"
+    ]
+  }
+}
