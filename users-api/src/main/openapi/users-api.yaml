@@ -1,0 +1,115 @@
+openapi: 3.0.3
+info:
+  title: Quarkus Academy OpenAPI
+  version: 1.0.0-SNAPSHOT
+tags:
+  - name: Users
+    description: Users API
+paths:
+  /api/users:
+    get:
+      tags:
+        - Users
+      operationId: users
+      responses:
+        "200":
+          description: List of all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserDto"
+    put:
+      tags:
+        - Users
+      operationId: update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: "#/components/schemas/UserDto"
+      responses:
+        "200":
+          description: User object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDto"
+    post:
+      tags:
+        - Users
+      operationId: save
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: "#/components/schemas/UserDto"
+      responses:
+        "200":
+          description: User was sucessfuly saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDto"
+  /api/users/{id}:
+    get:
+      tags:
+        - Users
+      operationId: user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: omit-birthdate
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: User object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDto"
+    delete:
+      tags:
+        - Users
+      operationId: delete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User was deleted
+components:
+  schemas:
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id of the user
+          example: 1
+        name:
+          type: string
+          description: First name of the user
+          example: Adam
+        surname:
+          type: string
+          description: Last name of the user
+          example: Seidel
+        birthDate:
+          description: Birth date of the user
+          $ref: "#/components/schemas/LocalDate"
+    LocalDate:
+      format: date
+      type: string
+      example: 2022-03-10
