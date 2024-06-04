@@ -20,6 +20,7 @@
     </properties>
     <modules>
         <module>main</module>
+        <module>users-api</module>
     </modules>
 
     <dependencyManagement>
