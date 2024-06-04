@@ -7,6 +7,8 @@ import java.util.List;
 
 import com.ibm.quarkus.academy.dto.UserDto;
 
+import io.quarkus.security.Authenticated;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -26,14 +28,13 @@ public class UsersResource {
 
     @GET
     @Produces({"application/json"})
+    @Authenticated
     public Response users() {
         UserDto user1 = UserDto.builder()
-                .id("some-id-1")
                 .name("Adam")
                 .surname("Seidel")
                 .birthDate(LocalDate.of(1990, 1, 1)).build();
         UserDto user2 = UserDto.builder()
-                .id("some-id-2")
                 .name("John")
                 .surname("Doe")
                 .birthDate(LocalDate.of(1990, 2, 1)).build();
@@ -78,13 +79,9 @@ public class UsersResource {
     @GET
     @Path("/{id}")
     @Produces({"application/json"})
+    @RolesAllowed("ADMIN")
     public Response user(@PathParam("id") String id,
                          @QueryParam("omit-birthdate") boolean omitBirthdate) {
-        if ("1".equals(id)) {
-            return Response.serverError().build();
-        } else if ("2".equals(id)) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
-        }
         UserDto userDto = UserDto.builder()
                 .name("Adam")
                 .surname("Seidel")
