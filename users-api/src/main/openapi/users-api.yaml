@@ -28,12 +28,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDto"
-        "403":
-          description: Not Allowed
-        "401":
-          description: Not Authorized
-      security:
-        - apiKey: []
     put:
       tags:
         - Users Resource
@@ -135,7 +129,3 @@ components:
           allOf:
             - $ref: "#/components/schemas/LocalDate"
           example: 2000-01-01
-  securitySchemes:
-    apiKey:
-      type: http
-      scheme: Bearer
